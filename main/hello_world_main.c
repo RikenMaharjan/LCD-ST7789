@@ -13,6 +13,7 @@
 #include "wifi_handler.h"
 #include "driver_init.h"
 #include "main_ui.h"
+#include "heap_monitor.h"
 
 static void app_main_UI_starter(void *params)
 {
@@ -42,12 +43,17 @@ void app_main()
 
     ESP_ERROR_CHECK(esp_netif_init());
     ESP_ERROR_CHECK(esp_event_loop_create_default());
-
+    heap_monitor_init();  // Captures: "245,678 bytes free"    
     lcd_driver_init();
+    heap_monitor_print("After LCD");  // Shows: "232,450 bytes free" (-13KB)    
     lvgl_init();
-    touch_driver_init();
+    heap_monitor_print("After LVGL"); // Shows: "198,234 bytes free" (-34KB)    
+    touch_spi_init();
+    heap_monitor_print("After Touch SPI driver"); // Shows: "xxx bytes free" (-40KB)
     driver_touch_init();
-    wifi_handler_init_wifi();
-
+    heap_monitor_print("After Driver Touch"); // Shows: "xxx bytes free" (-40KB)
+    wifi_handler_init();
+    heap_monitor_print("After WiFi"); // Shows: "158,000 bytes free" (-40KB)
+    
     xTaskCreate(app_main_UI_starter, "ui-starter", 4096 * 2, NULL, 3, NULL);
 }

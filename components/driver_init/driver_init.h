@@ -7,7 +7,7 @@
 void lvgl_init(void);
 void lvgl_task(void *pvParameter);
 void lcd_driver_init(void);
-void touch_driver_init(void);
+void touch_spi_init(void);
 void driver_touch_init();
 
 #endif

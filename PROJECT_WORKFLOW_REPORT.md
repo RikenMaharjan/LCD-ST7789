@@ -210,7 +210,7 @@ Step 4: LVGL Graphics Library
 
 Step 5: Touch Controller
 ┌─────────────────────────────────────┐
-│ touch_driver_init() +               │
+│ touch_spi_init() +                  │
 │ driver_touch_init()                 │
 │ 1. Configure SPI3 bus               │
 │    - SCLK: GPIO 25                  │
@@ -227,7 +227,7 @@ Step 5: Touch Controller
 
 Step 6: WiFi Subsystem
 ┌─────────────────────────────────────┐
-│ wifi_handler_init_wifi()            │
+│ wifi_handler_init()                 │
 │ 1. Create STA network interface     │
 │ 2. Initialize WiFi with default cfg │
 │ 3. Register event handlers:         │
@@ -422,7 +422,7 @@ flush_cb(disp, area, px_map)
 ### 3. WiFi Handler Component (`components/wifi_handler/`)
 
 ```
-wifi_handler_init_wifi()
+wifi_handler_init()
 │
 ├─ Create Station Interface
 │  └─ esp_netif_create_default_wifi_sta()

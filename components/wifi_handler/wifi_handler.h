@@ -7,7 +7,7 @@
 
 typedef void (*wifi_record_handler)(uint16_t scan_number, wifi_ap_record_t *record);
 
-void wifi_handler_init_wifi();
+void wifi_handler_init();
 void wifi_handler_start_scan(wifi_record_handler wifi_handler);
 
 #endif // __WIFI_HANDLER_H__

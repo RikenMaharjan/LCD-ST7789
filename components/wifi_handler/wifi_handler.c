@@ -15,7 +15,7 @@ const wifi_scan_config_t scan_config = {
     .scan_time.active.min = 0,
 };
 
-void wifi_handler_init_wifi()
+void wifi_handler_init()
 {
     esp_netif_create_default_wifi_sta();
 

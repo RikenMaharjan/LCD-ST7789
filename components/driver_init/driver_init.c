@@ -122,8 +122,8 @@ void lvgl_init(void)
     setup_timer();
 
     display = lv_display_create(LCD_H_RES, LCD_V_RES);
-
-    size_t draw_buffer_sz = LCD_V_RES * 20 * sizeof(lv_color16_t);
+#warning "why 20 not 80"?;
+    size_t draw_buffer_sz = LCD_V_RES * 20 * sizeof(lv_color16_t); 
     void *buf1 = spi_bus_dma_memory_alloc(LCD_HOST, draw_buffer_sz, 0);
     assert(buf1);
     void *buf2 = spi_bus_dma_memory_alloc(LCD_HOST, draw_buffer_sz, 0);
@@ -155,7 +155,7 @@ void lvgl_task(void *pvParameter)
     }
 }
 
-void touch_driver_init(void)
+void touch_spi_init(void)
 {
     spi_bus_config_t touch_xpt2056_buscfg = {
         .sclk_io_num = TOUCH_SCLK_PIN,
