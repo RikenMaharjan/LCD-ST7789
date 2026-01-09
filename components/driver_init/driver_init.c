@@ -29,7 +29,7 @@
 #define LCD_HOST SPI2_HOST
 #define TOUCH_HOST SPI3_HOST
 
-#define LCD_SCLK_PIN 14
+#define LCD_SCLK_PIN 14 // TFT_sck
 #define LCD_MOSI_PIN 13
 #define LCD_MISO_PIN 12
 #define LCD_DC_PIN 2
@@ -55,8 +55,9 @@ static void touch_input_init();
 static void lv_tick_task(void *arg);
 static void flush_cb(lv_display_t *disp, const lv_area_t *area, uint8_t *px_map);
 
-void lcd_driver_init(void)
+esp_err_t lcd_driver_init(void)
 {
+    esp_err_t ret = ESP_FAIL;
     ESP_LOGI(TAG, "Initializing LCD");
 
     spi_bus_config_t lcd_spi_config = {
@@ -83,32 +84,43 @@ void lcd_driver_init(void)
     };
     // Configure backlight GPIO
     gpio_config_t bk_gpio_config = {.mode = GPIO_MODE_OUTPUT, .pin_bit_mask = 1ULL << 21};
-    ESP_ERROR_CHECK(gpio_config(&bk_gpio_config));
+    ret = gpio_config(&bk_gpio_config);
+    ESP_ERROR_CHECK(ret);
     gpio_set_level(21, 0); // Turn off initially
 
     // Configure SPI bus
-    ESP_ERROR_CHECK(spi_bus_initialize(LCD_HOST, &lcd_spi_config, SPI_DMA_CH_AUTO));
+    ret = spi_bus_initialize(LCD_HOST, &lcd_spi_config, SPI_DMA_CH_AUTO);
+    ESP_ERROR_CHECK(ret);
 
     // Configure LCD IO
-    ESP_ERROR_CHECK(esp_lcd_new_panel_io_spi((esp_lcd_spi_bus_handle_t)LCD_HOST, &io_config, &lcd_io_handle));
+    ret = esp_lcd_new_panel_io_spi((esp_lcd_spi_bus_handle_t)LCD_HOST, &io_config, &lcd_io_handle);
+    ESP_ERROR_CHECK(ret);
 
     // Configure LCD panel
-    ESP_ERROR_CHECK(esp_lcd_new_panel_st7789(lcd_io_handle, &panel_config, &lcd_panel_handle));
+    ret = esp_lcd_new_panel_st7789(lcd_io_handle, &panel_config, &lcd_panel_handle);
+    ESP_ERROR_CHECK(ret);
 
     // Initialize panel
-    ESP_ERROR_CHECK(esp_lcd_panel_reset(lcd_panel_handle));
-    ESP_ERROR_CHECK(esp_lcd_panel_init(lcd_panel_handle));
+    ret = esp_lcd_panel_reset(lcd_panel_handle);
+    ESP_ERROR_CHECK(ret);
+    ret = esp_lcd_panel_init(lcd_panel_handle);
+    ESP_ERROR_CHECK(ret);
 
     // Configure display orientation (adjust these if display is rotated/mirrored wrong)
-    ESP_ERROR_CHECK(esp_lcd_panel_swap_xy(lcd_panel_handle, false));
-    ESP_ERROR_CHECK(esp_lcd_panel_mirror(lcd_panel_handle, false, false));
-    ESP_ERROR_CHECK(esp_lcd_panel_invert_color(lcd_panel_handle, false));
+    ret = esp_lcd_panel_swap_xy(lcd_panel_handle, false);
+    ESP_ERROR_CHECK(ret);
+    ret = esp_lcd_panel_mirror(lcd_panel_handle, false, false);
+    ESP_ERROR_CHECK(ret);
+    ret = esp_lcd_panel_invert_color(lcd_panel_handle, false);
+    ESP_ERROR_CHECK(ret);
     //
     // Gap settings for ST7789 (may need adjustment based on your specific display)
-    ESP_ERROR_CHECK(esp_lcd_panel_set_gap(lcd_panel_handle, 0, 0));
+    ret = esp_lcd_panel_set_gap(lcd_panel_handle, 0, 0);
+    ESP_ERROR_CHECK(ret);
 
     // Turn on display
-    ESP_ERROR_CHECK(esp_lcd_panel_disp_on_off(lcd_panel_handle, true));
+    ret = esp_lcd_panel_disp_on_off(lcd_panel_handle, true);
+    ESP_ERROR_CHECK(ret);
 
     // Turn on backlight
     gpio_set_level(LCD_BACKLIGHT_PIN, 1);
