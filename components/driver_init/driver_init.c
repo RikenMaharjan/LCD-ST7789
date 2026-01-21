@@ -26,21 +26,63 @@
 
 #define TAG "esp_lcd"
 
-#define LCD_HOST SPI2_HOST
-#define TOUCH_HOST SPI3_HOST
 
-#define LCD_SCLK_PIN 14 // TFT_sck
-#define LCD_MOSI_PIN 13
-#define LCD_MISO_PIN 12
-#define LCD_DC_PIN 2
-#define LCD_CS_PIN 15
-#define LCD_BACKLIGHT_PIN 21
+#define TOUCH_X_RES_MIN 0
+#define TOUCH_X_RES_MAX 240
+#define TOUCH_Y_RES_MIN 0
+#define TOUCH_Y_RES_MAX 320
 
-#define TOUCH_SCLK_PIN 25
-#define TOUCH_MOSI_PIN 32
-#define TOUCH_MISO_PIN 39
-#define TOUCH_INT_PIN 36
-#define TOUCH_CS_PIN 33
+#define LCD_H_RES          240 // TOUCH_X_RES_MAX 
+#define LCD_V_RES          320 // TOUCH_Y_RES_MAX
+#define LCD_BITS_PIXEL     16
+#define LCD_BUF_LINES      30
+#define LCD_DOUBLE_BUFFER  1
+#define LCD_DRAWBUF_SIZE   (LCD_H_RES * LCD_BUF_LINES)
+#define LCD_MIRROR_X       (true)
+#define LCD_MIRROR_Y       (false)
+
+#define LCD_PIXEL_CLOCK_HZ      (40 * 1000 * 1000)
+#define LCD_CMD_BITS            (8)
+#define LCD_PARAM_BITS          (8)
+
+#define LCD_HOST                SPI2_HOST
+#define LCD_SCLK_PIN            (gpio_num_t) GPIO_NUM_14
+#define LCD_MOSI_PIN            (gpio_num_t) GPIO_NUM_13
+#define LCD_MISO_PIN            (gpio_num_t) GPIO_NUM_12
+#define LCD_DC_PIN              (gpio_num_t) GPIO_NUM_2
+#define LCD_CS_PIN              (gpio_num_t) GPIO_NUM_15
+#define LCD_BACKLIGHT_PIN       (gpio_num_t) GPIO_NUM_21
+
+#define LCD_BACKLIGHT_LEDC_CH   (1)
+#define LCD_RESET               (gpio_num_t) GPIO_NUM_4
+#define LCD_BUSY                (gpio_num_t) GPIO_NUM_NC
+
+
+// #define TOUCH_CLOCK_HZ ESP_LCD_TOUCH_SPI_CLOCK_HZ  // already in default config
+#define TOUCH_HOST          SPI3_HOST
+#define TOUCH_SCLK_PIN      (gpio_num_t) GPIO_NUM_25
+#define TOUCH_MOSI_PIN      (gpio_num_t) GPIO_NUM_32
+#define TOUCH_MISO_PIN      (gpio_num_t) GPIO_NUM_39
+#define TOUCH_CS_PIN        (gpio_num_t) GPIO_NUM_33
+#define TOUCH_INT_PIN       (gpio_num_t) GPIO_NUM_36
+#define TOUCH_DC            (gpio_num_t) GPIO_NUM_NC
+#define TOUCH_RST           (gpio_num_t) GPIO_NUM_NC
+
+
+// #define LCD_HOST SPI2_HOST
+// #define LCD_SCLK_PIN 14 // TFT_sck
+// #define LCD_MOSI_PIN 13
+// #define LCD_MISO_PIN 12
+// #define LCD_DC_PIN 2
+// #define LCD_CS_PIN 15
+// #define LCD_BACKLIGHT_PIN 21
+
+// #define TOUCH_HOST SPI3_HOST
+// #define TOUCH_SCLK_PIN 25
+// #define TOUCH_MOSI_PIN 32
+// #define TOUCH_MISO_PIN 39
+// #define TOUCH_INT_PIN 36
+// #define TOUCH_CS_PIN 33
 
 static lv_display_t *display;
 static esp_lcd_panel_io_handle_t lcd_io_handle;
@@ -64,23 +106,23 @@ esp_err_t lcd_driver_init(void)
         .sclk_io_num = LCD_SCLK_PIN,
         .mosi_io_num = LCD_MOSI_PIN,
         .miso_io_num = LCD_MISO_PIN,
-        .quadwp_io_num = -1,
-        .quadhd_io_num = -1,
+        .quadwp_io_num = GPIO_NUM_NC,
+        .quadhd_io_num = GPIO_NUM_NC,
         .max_transfer_sz = LCD_H_RES * 80 * sizeof(uint16_t),
     };
     esp_lcd_panel_io_spi_config_t io_config = {
         .dc_gpio_num = LCD_DC_PIN,
         .cs_gpio_num = LCD_CS_PIN,
-        .pclk_hz = 40 * 1000 * 1000,
-        .lcd_cmd_bits = 8,
-        .lcd_param_bits = 8,
+        .pclk_hz = LCD_PIXEL_CLOCK_HZ,
+        .lcd_cmd_bits = LCD_CMD_BITS,
+        .lcd_param_bits = LCD_PARAM_BITS,
         .spi_mode = 0,
         .trans_queue_depth = 10,
     };
     esp_lcd_panel_dev_config_t panel_config = {
-        .reset_gpio_num = -1,
+        .reset_gpio_num = LCD_RESET,
         .rgb_ele_order = LCD_RGB_ELEMENT_ORDER_RGB,
-        .bits_per_pixel = 16,
+        .bits_per_pixel = LCD_BITS_PIXEL,
     };
     // Configure backlight GPIO
     gpio_config_t bk_gpio_config = {.mode = GPIO_MODE_OUTPUT, .pin_bit_mask = 1ULL << 21};
@@ -173,8 +215,8 @@ void touch_spi_init(void)
         .sclk_io_num = TOUCH_SCLK_PIN,
         .mosi_io_num = TOUCH_MOSI_PIN,
         .miso_io_num = TOUCH_MISO_PIN,
-        .quadwp_io_num = -1,
-        .quadhd_io_num = -1,
+        .quadwp_io_num = GPIO_NUM_NC,
+        .quadhd_io_num = GPIO_NUM_NC,
         .max_transfer_sz = 10,
     };
     ESP_ERROR_CHECK(spi_bus_initialize(TOUCH_HOST, &touch_xpt2056_buscfg, SPI_DMA_CH_AUTO));
