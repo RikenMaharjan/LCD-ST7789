@@ -1,5 +1,5 @@
 idf_component_register(
-    SRCS "driver_init.c"
+    SRCS "driver_touch.c" "driver_init.c"
     INCLUDE_DIRS "."
     REQUIRES    lvgl 
                 driver 

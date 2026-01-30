@@ -24,6 +24,8 @@
 
 #include "driver_init.h"
 
+#include "driver_touch.h"
+
 #define TAG "esp_lcd"
 
 
@@ -245,6 +247,7 @@ void driver_touch_init()
     touch_pad = touch_handle; // Properly assign touch_handle to touch_pad
     touch_input_init();
 
+    touch_init(&touch_handle);
     ESP_LOGI(TAG, "Initialize touch controller XPT2046");
 }
 
