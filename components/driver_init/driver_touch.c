@@ -26,7 +26,7 @@ static void process_coordinates(esp_lcd_touch_handle_t tp, uint16_t *x, uint16_t
     *y = map(*y, TOUCH_Y_RES_MIN, TOUCH_Y_RES_MAX, 0, LCD_V_RES);
 }
 
-esp_err_t touch_init(esp_lcd_touch_handle_t *tp)
+esp_err_t lcd_touch_init(esp_lcd_touch_handle_t *tp)
 {
     esp_lcd_panel_io_handle_t tp_io_handle = NULL;
 
@@ -42,9 +42,10 @@ esp_err_t touch_init(esp_lcd_touch_handle_t *tp)
         .flags = { .dc_low_on_data = 0, .octal_mode = 0, .sio_mode = 0, .lsb_first = 0, .cs_high_active = 0 } };
 
     static const int SPI_MAX_TRANSFER_SIZE = 32768;
-    const spi_bus_config_t buscfg_touch = { .mosi_io_num = TOUCH_SPI_MOSI,
-        .miso_io_num = TOUCH_SPI_MISO,
+    const spi_bus_config_t buscfg_touch = { 
         .sclk_io_num = TOUCH_SPI_CLK,
+        .mosi_io_num = TOUCH_SPI_MOSI,
+        .miso_io_num = TOUCH_SPI_MISO,
         .quadwp_io_num = GPIO_NUM_NC,
         .quadhd_io_num = GPIO_NUM_NC,
         .data4_io_num = GPIO_NUM_NC,
@@ -70,9 +71,9 @@ esp_err_t touch_init(esp_lcd_touch_handle_t *tp)
                                    .process_coordinates = process_coordinates,
                                    .interrupt_callback = NULL};
 
-    ESP_ERROR_CHECK(spi_bus_initialize(TOUCH_SPI, &buscfg_touch, SPI_DMA_CH_AUTO));
+    ESP_ERROR_CHECK(spi_bus_initialize(TOUCH_SPI_HOST, &buscfg_touch, SPI_DMA_CH_AUTO));
 
-    ESP_ERROR_CHECK(esp_lcd_new_panel_io_spi((esp_lcd_spi_bus_handle_t)TOUCH_SPI, &tp_io_config, &tp_io_handle));
+    ESP_ERROR_CHECK(esp_lcd_new_panel_io_spi((esp_lcd_spi_bus_handle_t)TOUCH_SPI_HOST, &tp_io_config, &tp_io_handle));
     ESP_ERROR_CHECK(esp_lcd_touch_new_spi_xpt2046(tp_io_handle, &tp_cfg, tp));
 
     return ESP_OK;

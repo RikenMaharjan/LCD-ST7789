@@ -32,14 +32,14 @@
 #define TOUCH_Y_RES_MIN 0
 #define TOUCH_Y_RES_MAX 320
 
-#define TOUCH_CLOCK_HZ ESP_LCD_TOUCH_SPI_CLOCK_HZ
-#define TOUCH_SPI      SPI3_HOST
-#define TOUCH_SPI_CLK  (gpio_num_t) GPIO_NUM_25
-#define TOUCH_SPI_MOSI (gpio_num_t) GPIO_NUM_32
-#define TOUCH_SPI_MISO (gpio_num_t) GPIO_NUM_39
-#define TOUCH_CS       (gpio_num_t) GPIO_NUM_33
-#define TOUCH_DC       (gpio_num_t) GPIO_NUM_NC
-#define TOUCH_RST      (gpio_num_t) GPIO_NUM_NC
-#define TOUCH_IRQ      (gpio_num_t) GPIO_NUM_36
+#define TOUCH_CLOCK_HZ      ESP_LCD_TOUCH_SPI_CLOCK_HZ
+#define TOUCH_SPI_HOST      SPI3_HOST
+#define TOUCH_SPI_CLK       (gpio_num_t) GPIO_NUM_25
+#define TOUCH_SPI_MOSI      (gpio_num_t) GPIO_NUM_32
+#define TOUCH_SPI_MISO      (gpio_num_t) GPIO_NUM_39
+#define TOUCH_CS            (gpio_num_t) GPIO_NUM_33
+#define TOUCH_DC            (gpio_num_t) GPIO_NUM_NC
+#define TOUCH_RST           (gpio_num_t) GPIO_NUM_NC
+#define TOUCH_IRQ           (gpio_num_t) GPIO_NUM_36
 
 #endif /*_PIN_SETUP_H_*/
