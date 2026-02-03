@@ -99,7 +99,7 @@ static void touch_input_init();
 static void lv_tick_task(void *arg);
 static void flush_cb(lv_display_t *disp, const lv_area_t *area, uint8_t *px_map);
 
-esp_err_t lcd_driver_init(void)
+void lcd_driver_init(void)
 {
     esp_err_t ret = ESP_FAIL;
     ESP_LOGI(TAG, "Initializing LCD");
@@ -247,7 +247,7 @@ void driver_touch_init()
     touch_pad = touch_handle; // Properly assign touch_handle to touch_pad
     touch_input_init();
 
-    touch_init(&touch_handle);
+    // custom_touch_init(&touch_handle);
     ESP_LOGI(TAG, "Initialize touch controller XPT2046");
 }
 
@@ -261,18 +261,21 @@ static void setup_timer()
 
 static void lvgl_touch_cb(lv_indev_t *indev, lv_indev_data_t *data)
 {
-    uint16_t touchpad_x[1] = {0};
-    uint16_t touchpad_y[1] = {0};
+    // uint16_t touchpad_x[1] = {0};
+    // uint16_t touchpad_y[1] = {0};
+    
     uint8_t touchpad_cnt = 0;
+    esp_lcd_touch_point_data_t touch_data = {0};
 
     esp_lcd_touch_read_data(touch_pad);
     /* Get coordinates */
-    bool touchpad_pressed = esp_lcd_touch_get_coordinates(touch_pad, touchpad_x, touchpad_y, NULL, &touchpad_cnt, 1);
+    bool touchpad_pressed = esp_lcd_touch_get_data(touch_pad, &touch_data, &touchpad_cnt, 1);
+    //  esp_lcd_touch_get_coordinates(touch_pad, touchpad_x, touchpad_y, NULL, &touchpad_cnt, 1);
 
     if (touchpad_pressed && touchpad_cnt > 0)
     {
-        data->point.x = LCD_H_RES - 1 - touchpad_x[0];
-        data->point.y = touchpad_y[0];
+        data->point.x = LCD_H_RES - 1 - (touch_data.x);
+        data->point.y = touch_data.y;
         data->state = LV_INDEV_STATE_PRESSED;
         // esp_rom_printf("%d, %d\n", data->point.x, data->point.y);
     }
